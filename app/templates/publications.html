@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block titre -%}<title>Publications</title>{%- endblock titre %}
+
+{% block contenu %}
+<div class="w3-content w3-section w3-padding w3-cell-row w3-card-4 w3-text-white" style="background-color:#ff3300;">
+    <div class="w3-cell w3-left">
+        <a href="{{ url_for('carousel_cabotage') }}">
+            <img class="w3-hover-opacity" src="\static\images\8\01couverture.jpg" alt="Cabotage en Armor - Couverture" style="height:200px">
+        </a>
+    </div>
+    <div class="w3-cell w3-cell-top w3-right">
+        <h4>Cabotage en Armor</h4>
+        <p>Aquarelles, dessins et textes</p>
+        <p>Éditions de l'Arcouest</p>
+        <p>Disponible en contactant <a href="{{ url_for('contact') }}">Juliette Le More</a> au prix de 28€</p>
+    </div>
+</div>
+<div class="w3-content w3-section w3-padding w3-cell-row w3-card-4 w3-text-white" style="background-color:#ff3300;">
+    <div class="w3-cell w3-cell-top w3-left">
+        <h4>A. Le More</h4>
+        <p>Monographie</p>
+        <p>Éditions du Léopard d'Or</p>
+        <p>Disponible chez l'<a href="https://www.leopardor.fr/index.php/arts/a-le-more.html">éditeur</a> au prix de 60€</p>
+    </div>
+    <div class="w3-cell w3-right">
+        <img class="w3-hover-opacity" onclick="document.getElementById('modal').style.display='block';" src="\static\images\couverture_01.jpg" alt="A. Le More - Couverture" style="height:200px;cursor:zoom-in">
+    </div>
+</div>
+<div onclick="document.getElementById('modal').style.display='none';" id="modal" class="w3-modal">
+    <div class="w3-modal-content" style="max-width:396px; background-color:transparent">
+        <img class="w3-modal-content w3-card-4 w3-animate-opacity" src="\static\images\couverture_01.jpg" alt="Cabotage en Armor" style="max-width:100%">
+    </div>
+</div>
+{% endblock contenu %}
