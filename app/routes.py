@@ -8,7 +8,7 @@ from app.database import fetch_collections, fetch_collection
 def collections():
     étiquettes = fetch_collections()
 
-    return render_template("oeuvres.html", étiquettes=étiquettes)
+    return render_template("collections.html", étiquettes=étiquettes)
 
 
 @app.route("/collections/<int:id_collection>")
