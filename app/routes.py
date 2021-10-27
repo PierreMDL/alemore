@@ -82,10 +82,14 @@ def admin_collections():
         return redirect("/connexion/")
 
     if request.method == "POST":
-        assert request.form["titre"]
         assert request.form["id_collection"]
 
-        update_collection(request.form["id_collection"], request.form["titre"], request.form["description"])
+        id_collection = request.form["id_collection"]
+        titre = request.form["titre"] or "Sans titre"
+        description = request.form["description"].replace("<br>", "\n").strip()
+        slug = titre.replace(".", "").translate(str.maketrans(" éèà", "-eeà")).lower()
+
+        update_collection(id_collection=id_collection, titre=titre, slug=slug, description=description)
 
     étiquettes = fetch_admin_collections()
 
@@ -99,10 +103,13 @@ def admin_collection(id_collection):
         return render_template("administration.html")
 
     if request.method == "POST":
-        assert request.form["titre"]
         assert request.form["id_tableau"]
 
-        update_painting(request.form["id_tableau"], request.form["titre"], request.form["description"])
+        id_tableau = request.form["id_tableau"]
+        titre = request.form["titre"] or "Sans titre"
+        description = request.form["description"].replace("<br>", "\n").strip()
+
+        update_painting(id_tableau=id_tableau, titre=titre, description=description)
 
     coll = fetch_collection(id_collection=id_collection)
 

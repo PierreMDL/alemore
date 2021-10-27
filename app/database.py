@@ -65,9 +65,7 @@ def fetch_collection(id_collection: int = None, slug: str = None):
         return coll
 
 
-def update_collection(id_collection, titre, description):
-
-    slug = titre.replace(".", "").translate(str.maketrans(" éèà", "-eeà")).lower()
+def update_collection(id_collection, titre, slug, description):
     statement = f"UPDATE collections SET titre='{titre}', slug='{slug}', description='{description}' WHERE id_collection={id_collection};"
     coll_update = connect_to_db(statement, many=False)
 
