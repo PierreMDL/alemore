@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, request, session, redirect
-from app.database import fetch_collections, fetch_collection, update_collection, fetch_admin_collections
+from app.database import fetch_collections, fetch_collection, update_collection, update_painting, fetch_admin_collections
 
 
 @app.route("/")
@@ -18,7 +18,7 @@ def carousel(id_collection, slug=""):
     coll = fetch_collection(id_collection=id_collection)
 
     if coll:
-        return render_template("carousel.html", carousel=coll, titre_page=coll.titre_collection)
+        return render_template("carousel.html", carousel=coll, titre_page=coll.titre)
     else:
         return render_template("page_inexistante.html", titre_page="Page inexistante")
 
@@ -38,7 +38,7 @@ def carousel_cabotage():
     coll = fetch_collection(id_collection=8)
 
     if coll:
-        return render_template("carousel.html", carousel=coll, titre_page=coll.titre_collection)
+        return render_template("carousel.html", carousel=coll, titre_page=coll.titre)
     else:
         return render_template("page_inexistante.html")
 
@@ -92,12 +92,23 @@ def admin_collections():
     return render_template("admin_collections.html", étiquettes=étiquettes)
 
 
-@app.route("/administration/collections/<int:id_collection>")
+@app.route("/administration/collections/<int:id_collection>", methods=["GET", "POST"])
 def admin_collection(id_collection):
 
-    if "user" in session and session["user"] == "admin":
+    if not ("user" in session and session["user"] == "admin"):
         return render_template("administration.html")
 
-    carousel = fetch_collection(id_collection=id_collection)
+    if request.method == "POST":
+        assert request.form["titre"]
+        assert request.form["id_tableau"]
 
-    return render_template("admin_collection.html", carousel=carousel)
+        update_painting(request.form["id_tableau"], request.form["titre"], request.form["description"])
+
+    coll = fetch_collection(id_collection=id_collection)
+
+    # TODO - Virer ça
+    for tableau in coll.tableaux:
+        tableau.description = "<br>".join(tableau.description)
+
+
+    return render_template("admin_collection.html", collection=coll)

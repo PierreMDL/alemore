@@ -24,13 +24,13 @@
   {%- for étiquette in étiquettes %}
   <div class="w3-quarter w3-mobile" style="min-width:210px;">
     <div class="w3-display-container" style="width:200px; height:200px; margin:10px">
-      <img class="w3-card-4" src="{{ étiquette.src }}" alt="{{ étiquette.titre_collection.strip() }}"
+      <img class="w3-card-4" src="{{ étiquette.src }}" alt="{{ étiquette.titre.strip() }}"
            style="object-fit:cover; width:200px; height:200px" onclick="updateForm(this);">
       <div class="w3-display-hover w3-center w3-small w3-padding-small w3-opacity-min w3-gray w3-display-bottommiddle"
            style="width:100%">
-        <b class="titre">{{ étiquette.titre_collection }}</b>
-        <b class="w3-hide description">{{ étiquette.description_collection }}</b>
-        <b class="w3-hide id_collection">{{ étiquette.id_collection }}</b>
+        <b class="titre">{{ étiquette.titre }}</b>
+        <b class="w3-hide description">{{ étiquette.description or "" }}</b>
+        <b class="w3-hide id_collection">{{ étiquette.id }}</b>
       </div>
     </div>
   </div>
