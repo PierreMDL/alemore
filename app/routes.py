@@ -106,8 +106,4 @@ def admin_collection(id_collection):
 
     coll = fetch_collection(id_collection=id_collection)
 
-    # TODO - Virer ça
-    for tableau in coll.tableaux:
-        tableau.description = "<br>".join(tableau.description)
-
     return render_template("admin_collection.html", collection=coll)
