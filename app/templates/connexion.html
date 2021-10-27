@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+
+{% block titre -%}<title>Connexion</title>{%- endblock titre %}
+{% block contenu %}
+<div class="w3-content w3-card-4 w3-text-white" style="background-color:#ff3300; height:300px">
+  <form action="{{ url_for('connexion') }}" method="POST">
+    <p>Mot de passe</p>
+    <p><input type="password" name="password"></p>
+    <p><input type="submit" value="Connexion"></p>
+  </form>
+</div>
+{% endblock contenu %}

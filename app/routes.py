@@ -1,6 +1,6 @@
 from app import app
-from flask import render_template_string, render_template
-from app.database import fetch_collections, fetch_collection
+from flask import render_template, request, session, redirect
+from app.database import fetch_collections, fetch_collection, update_collection, fetch_admin_collections
 
 
 @app.route("/")
@@ -46,3 +46,58 @@ def carousel_cabotage():
 @app.route("/présentation/")
 def présentation():
     return render_template("présentation.html")
+
+
+@app.route("/connexion/", methods=["POST", "GET"])
+def connexion():
+    if request.method == "POST":
+        password = request.form.get("password")
+        if password == app.config.get("PASSWORD"):
+            session["user"] = "admin"
+            return redirect("/administration")
+        return redirect("/connexion")
+
+    return render_template("connexion.html")
+
+
+@app.route("/déconnexion/")
+def déconnexion():
+    if "user" in session:
+        session.pop("user")
+
+    return redirect("/connexion/")
+
+
+@app.route("/administration/")
+def administation():
+    if not ("user" in session and session["user"] == "admin"):
+        return redirect("/connexion/")
+
+    return render_template("administration.html")
+
+
+@app.route("/administration/collections/", methods=["GET", "POST"])
+def admin_collections():
+    if not ("user" in session and session["user"] == "admin"):
+        return redirect("/connexion/")
+
+    if request.method == "POST":
+        assert request.form["titre"]
+        assert request.form["id_collection"]
+
+        update_collection(request.form["id_collection"], request.form["titre"], request.form["description"])
+
+    étiquettes = fetch_admin_collections()
+
+    return render_template("admin_collections.html", étiquettes=étiquettes)
+
+
+@app.route("/administration/collections/<int:id_collection>")
+def admin_collection(id_collection):
+
+    if "user" in session and session["user"] == "admin":
+        return render_template("administration.html")
+
+    carousel = fetch_collection(id_collection=id_collection)
+
+    return render_template("admin_collection.html", carousel=carousel)

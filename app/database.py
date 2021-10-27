@@ -1,5 +1,6 @@
 import sqlite3 as sl
-import os
+
+from app.models import Étiquette, AdminÉtiquette, Collection, Tableau
 
 
 def connect_to_db(statement, many=True):
@@ -16,34 +17,22 @@ def connect_to_db(statement, many=True):
     return res
 
 
-class Étiquette:
-    def __init__(self, titre_collection: str, id_collection: int):
-        self.titre_collection = titre_collection
-        self.slug = self.titre_collection.replace(".", "").translate(str.maketrans(" éèà", "-eeà")).lower()
-        self.id_collection = id_collection
-        self.src = os.path.normpath(os.path.join("/static/images/", str(id_collection), os.listdir("app/static/images/" + str(id_collection) + "/")[0]))
-
-
-class Collection:
-    def __init__(self, titre_collection, description_collection):
-        self.titre_collection = titre_collection
-        self.description_collection = description_collection.split("\n")
-        self.tableaux = []
-
-
-class Tableau:
-    def __init__(self, titre_tableau, description_tableau, chemin):
-        self.titre_tableau = titre_tableau
-        self.description_tableau = description_tableau.split("\n")
-        self.src = os.path.normpath(os.path.join("/static", chemin))
-
-
 def fetch_collections():
 
-    statement = f"SELECT titre, id_collection FROM collections WHERE est_une_serie=True;"
+    statement = f"SELECT titre, id_collection, position FROM collections WHERE est_une_serie=True ORDER BY position;"
     coll_fetch = connect_to_db(statement=statement, many=True)
 
-    étiquettes = [Étiquette(titre_collection=titre, id_collection=id) for titre, id in coll_fetch]
+    étiquettes = [Étiquette(titre_collection=titre, id_collection=id_collection, position=position) for titre, id_collection, position in coll_fetch]
+
+    return étiquettes
+
+
+def fetch_admin_collections():
+
+    statement = f"SELECT titre, description, id_collection, position FROM collections WHERE est_une_serie=True ORDER BY position;"
+    coll_fetch = connect_to_db(statement=statement, many=True)
+
+    étiquettes = [AdminÉtiquette(titre_collection=titre, description_collection=description, id_collection=id_collection, position=position) for titre, description, id_collection, position in coll_fetch]
 
     return étiquettes
 
@@ -65,3 +54,10 @@ def fetch_collection(id_collection):
 
     else:
         return None
+
+
+def update_collection(id_collection, titre, description):
+    statement = f"UPDATE collections SET titre='{titre}', description='{description}' WHERE id_collection={id_collection};"
+    coll_update = connect_to_db(statement, many=False)
+
+    return coll_update
