@@ -12,10 +12,10 @@ def collections():
 
 
 @app.route("/collections/<int:id_collection>")
-@app.route("/collections/<int:id_collection>-<string:slug>")
-def carousel(id_collection, slug=""):
+@app.route("/collections/<string:slug>")
+def carousel(id_collection: int = None, slug: str = None):
 
-    coll = fetch_collection(id_collection=id_collection)
+    coll = fetch_collection(id_collection=id_collection, slug=slug)
 
     if coll:
         return render_template("carousel.html", carousel=coll, titre_page=coll.titre)
@@ -33,9 +33,9 @@ def publications():
     return render_template("publications.html")
 
 
-@app.route("/publications/cabotageenarmor")
+@app.route("/publications/cabotage-en-armor")
 def carousel_cabotage():
-    coll = fetch_collection(id_collection=8)
+    coll = fetch_collection(slug="cabotage-en-armor")
 
     if coll:
         return render_template("carousel.html", carousel=coll, titre_page=coll.titre)
@@ -69,7 +69,7 @@ def déconnexion():
 
 
 @app.route("/administration/")
-def administation():
+def administration():
     if not ("user" in session and session["user"] == "admin"):
         return redirect("/connexion/")
 
@@ -109,6 +109,5 @@ def admin_collection(id_collection):
     # TODO - Virer ça
     for tableau in coll.tableaux:
         tableau.description = "<br>".join(tableau.description)
-
 
     return render_template("admin_collection.html", collection=coll)

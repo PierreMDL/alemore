@@ -1,16 +1,21 @@
 import os
 
 
-class Étiquette:
-    def __init__(self, titre_collection: str, id_collection: int, position: int):
-        self.titre = titre_collection
-        self.slug = self.titre.replace(".", "").translate(str.maketrans(" éèà", "-eeà")).lower()
+class BaseÉtiquette:
+    def __init__(self, id_collection: int, titre_collection: str, position: int):
         self.id = id_collection
+        self.titre = titre_collection
         self.position = position
         self.src = os.path.normpath(os.path.join("/static/images/", str(id_collection), os.listdir("app/static/images/" + str(id_collection) + "/")[0]))
 
 
-class AdminÉtiquette(Étiquette):
+class Étiquette(BaseÉtiquette):
+    def __init__(self, id_collection:int, titre_collection: str, position: int, slug: str):
+        self.slug = slug
+        super().__init__(id_collection=id_collection, titre_collection=titre_collection, position=position)
+
+
+class AdminÉtiquette(BaseÉtiquette):
     def __init__(self, titre_collection: str, description_collection: str, id_collection: int, position: int):
         self.description = description_collection
         super().__init__(titre_collection=titre_collection, id_collection=id_collection, position=position)

@@ -7,7 +7,7 @@
   {%- for étiquette in étiquettes %}
   <div class="w3-quarter w3-mobile" style="min-width:210px;">
     <div class="w3-display-container" style="width:200px; height:200px; margin:10px">
-      <a href="{{ url_for('carousel', id_collection=étiquette.id, slug=étiquette.slug) }}">
+      <a href="{{ url_for('carousel', slug=étiquette.slug) }}">
         <img class="w3-card-4" src="{{ étiquette.src }}" alt="{{ étiquette.titre.strip() }}"
              style="object-fit:cover; width:200px; height:200px">
         <div class="w3-display-hover w3-center w3-small w3-padding-small w3-opacity-min w3-gray w3-display-bottommiddle"
