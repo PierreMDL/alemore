@@ -10,14 +10,14 @@ class BaseÉtiquette:
 
 
 class Étiquette(BaseÉtiquette):
-    def __init__(self, id_collection:int, titre_collection: str, position: int, slug: str):
+    def __init__(self, id_collection: int, titre_collection: str, position: int, slug: str):
         self.slug = slug
         super().__init__(id_collection=id_collection, titre_collection=titre_collection, position=position)
 
 
 class AdminÉtiquette(BaseÉtiquette):
     def __init__(self, titre_collection: str, description_collection: str, id_collection: int, position: int):
-        self.description = description_collection
+        self.description = description_collection.split("\n") if description_collection else []
         super().__init__(titre_collection=titre_collection, id_collection=id_collection, position=position)
 
 

@@ -38,10 +38,19 @@
 </div>
 <script>
   function updateForm(truc) {
-
     document.getElementById("id_tableau").value = truc.parentElement.getElementsByClassName("id_tableau")[0].innerHTML;
     document.getElementById("titre").value = truc.parentElement.getElementsByClassName("titre")[0].innerHTML;
-    document.getElementById("description").innerText = truc.parentElement.getElementsByClassName("description")[0].innerHTML;
+
+    description_list = truc.parentElement.getElementsByClassName("description");
+
+    list = [];
+    for (x of description_list) {
+      list = list.concat(x.innerText);
+    };
+    new_list = list.join("\n");
+
+    document.getElementById("description").value = new_list;
+
   }
 </script>
 {% endblock contenu %}

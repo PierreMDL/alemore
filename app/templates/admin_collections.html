@@ -13,7 +13,7 @@
       <h4 style="overflow:hidden; text-overflow:clip;">
         <b>Description de la collection</b>
       </h4>
-      <textarea id="description" name="description"></textarea>
+      <textarea id="description" name="description" style="white-space: pre-wrap;"></textarea>
       <input id="id_collection" type="hidden" name="id_collection" value="">
       <br>
       <input type="submit" value="Mettre à jour">
@@ -29,8 +29,12 @@
       <div class="w3-display-hover w3-center w3-small w3-padding-small w3-opacity-min w3-gray w3-display-bottommiddle"
            style="width:100%">
         <b class="titre">{{ étiquette.titre }}</b>
-        <b class="w3-hide description">{{ étiquette.description or "" }}</b>
-        <b class="w3-hide id_collection">{{ étiquette.id }}</b>
+        <div class="w3-hide">
+        {% for paragraphe in étiquette.description -%}
+          <p class="w3-small description">{{ paragraphe.strip() }}</p>
+        {% endfor %}
+        </div>
+        <span class="w3-hide id_collection">{{ étiquette.id }}</span>
       </div>
     </div>
   </div>
@@ -38,10 +42,19 @@
 </div>
 <script>
   function updateForm(truc) {
-
     document.getElementById("id_collection").value = truc.parentElement.getElementsByClassName("id_collection")[0].innerHTML;
     document.getElementById("titre").value = truc.parentElement.getElementsByClassName("titre")[0].innerHTML;
-    document.getElementById("description").innerText = truc.parentElement.getElementsByClassName("description")[0].innerHTML;
+
+    description_list = truc.parentElement.getElementsByClassName("description");
+
+    list = [];
+    for (x of description_list) {
+      list = list.concat(x.innerText);
+    };
+    new_list = list.join("\n");
+
+    document.getElementById("description").value = new_list;
+
   }
 </script>
 {% endblock contenu %}
