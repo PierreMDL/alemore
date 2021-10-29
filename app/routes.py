@@ -1,5 +1,5 @@
 from app import app, database_actions, filesystem_actions
-from flask import render_template, request, session, redirect
+from flask import render_template, request, session, redirect, escape
 from werkzeug.utils import secure_filename
 
 
@@ -84,8 +84,8 @@ def admin_collections():
     if request.method == "POST":
         assert request.form["action"]
 
-        titre = request.form["titre"]
-        description = request.form["description"].replace("<br>", "\n").strip()
+        titre = escape(request.form["titre"])
+        description = escape(request.form["description"].replace("<br>", "\n").strip())
         slug = titre.replace(".", "").translate(str.maketrans(" éèà", "-eeà")).lower()
 
         if request.form["action"] == "Mettre à jour":
@@ -115,8 +115,8 @@ def admin_tableaux(id_collection):
     if request.method == "POST":
         assert request.form["action"]
 
-        titre = request.form["titre"] or "Sans titre"
-        description = request.form["description"].replace("<br>", "\n").strip()
+        titre = escape(request.form["titre"]) or "Sans titre"
+        description = escape(request.form["description"].replace("<br>", "\n").strip())
 
         if request.form["action"] == "Mettre à jour":
             id_tableau = request.form["id_tableau"]
