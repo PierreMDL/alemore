@@ -6,7 +6,11 @@ class BaseÉtiquette:
         self.id = id_collection
         self.titre = titre_collection
         self.position = position
-        self.src = os.path.normpath(os.path.join("/static/images/", str(id_collection), os.listdir("app/static/images/" + str(id_collection) + "/")[0]))
+        toutes_les_images = os.listdir("app/static/images/" + str(id_collection) + "/")
+        if len(toutes_les_images) > 0:
+            self.src = os.path.normpath(os.path.join("/static/images/", str(id_collection), toutes_les_images[0]))
+        else:
+            self.src = os.path.normpath("/static/images/placeholder.jpg")
 
 
 class Étiquette(BaseÉtiquette):

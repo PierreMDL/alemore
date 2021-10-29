@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+
+{% block titre -%}<title>Administration - Tableaux</title>{%- endblock titre %}
+
+{% block contenu -%}
+<div class="w3-content">
+  {%- for tableau in collection.tableaux %}
+  <div class="w3-panel w3-black w3-opacity-max w3-padding-small">
+    <div>
+      <button onclick="dropTab(this, ['&#9654;','&#9660;'], 'tab_{{ tableau.id }}');">&#9654;</button>
+      <span>{{ tableau.titre }}</span>
+    </div>
+    <div id="tab_{{ tableau.id }}" class="w3-hide w3-row">
+      <form action="{{ url_for('admin_tableaux', id_collection=collection.id) }}" method="POST" class="w3-threequarter w3-padding-small" autocomplete="off">
+        <input type="text" name="titre" value="{{ tableau.titre }}"><br>
+        <textarea name="description" class="w3-block" rows="6">
+        {{- tableau.description|join('\n')-}}
+        </textarea>
+        <input type="hidden" name="id_tableau" value="{{ tableau.id }}">
+        <input type="submit" name="action" value="Mettre à jour">
+        <input type="submit" name="action" value="Supprimer" class="w3-right">
+      </form>
+      <div class="w3-quarter w3-padding-small">
+        <img src="{{ tableau.src }}" alt="{{ tableau.titre.strip() }}" class="w3-right" style="object-fit:cover; width:200px; height:200px;"
+             onclick="document.getElementById('modal').style.display='block'; document.getElementById('modal').firstElementChild.src=this.src;">
+      </div>
+    </div>
+  </div>
+  {%- endfor %}
+  <div class="w3-panel w3-black w3-opacity-max w3-padding-small">
+    <div>
+      <button onclick="dropTab(this, ['&plus;', '&plus;'], 'new_tab');">&plus;</button>
+      <span>Ajouter un tableau</span>
+    </div>
+    <div id="new_tab" class="w3-hide w3-row">
+      <form enctype=multipart/form-data action="{{ url_for('admin_tableaux', id_collection=collection.id) }}" method="POST" class="w3-threequarter w3-padding-small" autocomplete="off">
+        <input type="text" name="titre">
+        <input type="file" name="tableau" accept="image/jpeg" required><br>
+        <textarea name="description" class="w3-block" rows="6"></textarea>
+        <input type="submit" name="action" value="Ajouter">
+      </form>
+    </div>
+  </div>
+</div>
+  <div onclick="this.style.display='none';" id="modal" class="w3-modal w3-center">
+    <img class="w3-modal-content w3-animate-opacity" src="\static\images\couverture_01.jpg" alt="Modal" style="background-color:transparent; max-height:75vh; object-fit: none;">
+  </div>
+<script>
+  function dropTab(bouton, symboles, id_tableau) {
+    let tab = document.getElementById(id_tableau);
+    if (tab.classList.contains('w3-hide')) {
+      bouton.innerHTML = symboles[1];
+      tab.classList.replace('w3-hide', 'w3-show');
+    } else {
+      bouton.innerHTML = symboles[0];
+      tab.classList.replace('w3-show', 'w3-hide');
+    }
+  };
+</script>
+{% endblock contenu %}
