@@ -1,16 +1,12 @@
-import shutil
-
-from app import app
+from app import app, database_actions, filesystem_actions
 from flask import render_template, request, session, redirect
 from werkzeug.utils import secure_filename
-from app.database import obtenir_étiquettes, obtenir_collection, modifier_collection, modifier_tableau, obtenir_étiquettes_admin, créer_tableau, supprimer_tableau, supprimer_collection, créer_collection
-import os
 
 
 @app.route("/")
 @app.route("/collections/")
 def collections():
-    étiquettes = obtenir_étiquettes()
+    étiquettes = database_actions.obtenir_étiquettes()
 
     return render_template("collections.html", étiquettes=étiquettes)
 
@@ -19,7 +15,7 @@ def collections():
 @app.route("/collections/<string:slug>")
 def carousel(id_collection: int = None, slug: str = None):
 
-    coll = obtenir_collection(id_collection=id_collection, slug=slug)
+    coll = database_actions.obtenir_collection(id_collection=id_collection, slug=slug)
 
     if coll:
         return render_template("carousel.html", carousel=coll, titre_page=coll.titre)
@@ -39,7 +35,7 @@ def publications():
 
 @app.route("/publications/cabotage-en-armor")
 def carousel_cabotage():
-    coll = obtenir_collection(slug="cabotage-en-armor")
+    coll = database_actions.obtenir_collection(slug="cabotage-en-armor")
 
     if coll:
         return render_template("carousel.html", carousel=coll, titre_page=coll.titre)
@@ -94,18 +90,18 @@ def admin_collections():
 
         if request.form["action"] == "Mettre à jour":
             id_collection = request.form["id_collection"]
-            modifier_collection(id_collection=id_collection, titre=titre, slug=slug, description=description)
+            database_actions.modifier_collection(id_collection=id_collection, titre=titre, slug=slug, description=description)
 
         elif request.form["action"] == "Supprimer":
             id_collection = request.form["id_collection"]
-            supprimer_collection(id_collection)
-            shutil.rmtree(os.path.normpath(os.path.join("app", "static", "images", str(id_collection))))
+            database_actions.supprimer_collection(id_collection)
+            filesystem_actions.supprimer_dossier(id_collection)
 
         elif request.form["action"] == "Ajouter":
-            id_collection = créer_collection(titre, slug, description)
-            os.mkdir(os.path.normpath(os.path.join("app", "static", "images", str(id_collection))))
+            id_collection = database_actions.créer_collection(titre, slug, description)
+            filesystem_actions.créer_dossier(id_collection)
 
-    étiquettes = obtenir_étiquettes_admin()
+    étiquettes = database_actions.obtenir_étiquettes_admin()
 
     return render_template("admin_collections.html", étiquettes=étiquettes)
 
@@ -124,12 +120,12 @@ def admin_tableaux(id_collection):
 
         if request.form["action"] == "Mettre à jour":
             id_tableau = request.form["id_tableau"]
-            modifier_tableau(id_tableau=id_tableau, titre=titre, description=description)
+            database_actions.modifier_tableau(id_tableau=id_tableau, titre=titre, description=description)
 
         elif request.form["action"] == "Supprimer":
             id_tableau = request.form["id_tableau"]
-            chemin = supprimer_tableau(id_tableau)
-            os.remove(os.path.normpath(os.path.join("app", "static", chemin)))
+            id_collection, nom_fichier = database_actions.supprimer_tableau(id_tableau)
+            filesystem_actions.supprimer_fichier(id_collection, nom_fichier)
 
         elif request.form["action"] == "Ajouter":
             assert "tableau" in request.files
@@ -137,13 +133,12 @@ def admin_tableaux(id_collection):
 
             tableau = request.files["tableau"]
 
-            filename = secure_filename(tableau.filename)
-            chemin = os.path.normpath(os.path.join("images", str(id_collection), filename))
+            nom_fichier = secure_filename(tableau.filename)
 
-            tableau.save(os.path.normpath(os.path.join("app", "static", chemin)))
+            filesystem_actions.créer_fichier(id_collection, nom_fichier, tableau)
 
-            créer_tableau(titre=titre, description=description, id_collection=id_collection, chemin=chemin)
+            database_actions.créer_tableau(titre=titre, description=description, id_collection=id_collection, chemin=nom_fichier)
 
-    coll = obtenir_collection(id_collection=id_collection)
+    coll = database_actions.obtenir_collection(id_collection=id_collection)
 
     return render_template("admin_tableaux.html", collection=coll)

@@ -59,8 +59,8 @@ def obtenir_collection(id_collection: int = None, slug: str = None):
     if coll_fetch:
         coll = Collection(*coll_fetch)
         
-        for id_tableau, titre, description, chemin in paint_fetch:
-            coll.tableaux.append(Tableau(id_tableau=id_tableau, titre_tableau=titre, description_tableau=description, chemin=chemin))
+        for id_tableau, titre, description, nom_fichier in paint_fetch:
+            coll.tableaux.append(Tableau(id_tableau=id_tableau, titre_tableau=titre, description_tableau=description, id_collection=coll.id, nom_fichier=nom_fichier))
 
         return coll
 
@@ -87,10 +87,10 @@ def créer_tableau(titre, description, id_collection, chemin):
 
 
 def supprimer_tableau(id_tableau):
-    statement = f"DELETE FROM tableaux WHERE id_tableau={id_tableau} RETURNING chemin;"
+    statement = f"DELETE FROM tableaux WHERE id_tableau={id_tableau} RETURNING id_collection, chemin;"
     chemin = connecter_bdd(statement, many=False)
 
-    return chemin[0]
+    return chemin
 
 
 def supprimer_collection(id_collection):

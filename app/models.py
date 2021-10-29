@@ -1,4 +1,5 @@
 import os
+from app import filesystem_actions
 
 
 class BaseÉtiquette:
@@ -6,11 +7,11 @@ class BaseÉtiquette:
         self.id = id_collection
         self.titre = titre_collection
         self.position = position
-        toutes_les_images = os.listdir("app/static/images/" + str(id_collection) + "/")
+        toutes_les_images = os.listdir(filesystem_actions.construire_chemin_dossier(id_collection))
         if len(toutes_les_images) > 0:
-            self.src = os.path.normpath(os.path.join("/static/images/", str(id_collection), toutes_les_images[0]))
+            self.src = filesystem_actions.construire_chemin_fichier(id_collection, toutes_les_images[0], from_root=False)
         else:
-            self.src = os.path.normpath("/static/images/placeholder.jpg")
+            self.src = filesystem_actions.construire_chemin_fichier(id_collection, "placeholder.jpg", from_root=False)
 
 
 class Étiquette(BaseÉtiquette):
@@ -34,8 +35,8 @@ class Collection:
 
 
 class Tableau:
-    def __init__(self, id_tableau, titre_tableau, description_tableau, chemin):
+    def __init__(self, id_tableau, titre_tableau, description_tableau, id_collection, nom_fichier):
         self.id = id_tableau
         self.titre = titre_tableau
         self.description = description_tableau.split("\n") if description_tableau else []
-        self.src = os.path.normpath(os.path.join("/static", chemin))
+        self.src = filesystem_actions.construire_chemin_fichier(id_collection, nom_fichier, from_root=False)
