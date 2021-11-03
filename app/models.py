@@ -11,7 +11,7 @@ class BaseÉtiquette:
         if len(toutes_les_images) > 0:
             self.src = filesystem_actions.construire_chemin_fichier(id_collection, toutes_les_images[0], from_root=False)
         else:
-            self.src = filesystem_actions.construire_chemin_fichier(id_collection, "placeholder.jpg", from_root=False)
+            self.src = filesystem_actions.construire_chemin_fichier("", "placeholder.jpg", from_root=False)
 
 
 class Étiquette(BaseÉtiquette):

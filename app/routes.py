@@ -90,7 +90,8 @@ def admin_collections():
 
         if request.form["action"] == "Mettre à jour":
             id_collection = request.form["id_collection"]
-            database_actions.modifier_collection(id_collection=id_collection, titre=titre, slug=slug, description=description)
+            position = request.form["position"]
+            database_actions.modifier_collection(id_collection=id_collection, titre=titre, slug=slug, description=description, position=position)
 
         elif request.form["action"] == "Supprimer":
             id_collection = request.form["id_collection"]
@@ -120,7 +121,8 @@ def admin_tableaux(id_collection):
 
         if request.form["action"] == "Mettre à jour":
             id_tableau = request.form["id_tableau"]
-            database_actions.modifier_tableau(id_tableau=id_tableau, titre=titre, description=description)
+            position = request.form["position"]
+            database_actions.modifier_tableau(id_collection=id_collection, id_tableau=id_tableau, titre=titre, description=description, position=position)
 
         elif request.form["action"] == "Supprimer":
             id_tableau = request.form["id_tableau"]

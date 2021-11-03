@@ -4,57 +4,113 @@
 
 {% block contenu -%}
 <div class="w3-content">
-  {%- for tableau in collection.tableaux %}
-  <div class="w3-panel w3-black w3-opacity-max w3-padding-small">
-    <div>
-      <button onclick="dropTab(this, ['&#9654;','&#9660;'], 'tab_{{ tableau.id }}');">&#9654;</button>
-      <span>{{ tableau.titre }}</span>
-    </div>
-    <div id="tab_{{ tableau.id }}" class="w3-hide w3-row">
-      <form action="{{ url_for('admin_tableaux', id_collection=collection.id) }}" method="POST" class="w3-threequarter w3-padding-small" autocomplete="off">
-        <input type="text" name="titre" value="{{ tableau.titre }}"><br>
-        <textarea name="description" class="w3-block" rows="6">
-        {{- tableau.description|join('\n')-}}
-        </textarea>
-        <input type="hidden" name="id_tableau" value="{{ tableau.id }}">
-        <input type="submit" name="action" value="Mettre à jour">
-        <input type="submit" name="action" value="Supprimer" class="w3-right">
-      </form>
-      <div class="w3-quarter w3-padding-small">
+  <div>
+    {%- for tableau in collection.tableaux %}
+    <div id="{{ 'row_' + tableau.id|string }}" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin" draggable="true" ondragstart="startDrag(event);" ondrop="swapRow(event);" ondragover="allowDrop(event);">
+      <div>
+        <button class="dropdown-button" onclick="togglePanel(this.closest('.w3-panel'));">&#9654;</button>
+        <span>{{ tableau.titre }}</span>
+      </div>
+      <div class="w3-hide w3-row">
+        <form action="{{ url_for('admin_tableaux', id_collection=collection.id) }}" method="POST"
+              class="w3-threequarter w3-padding-small" autocomplete="off">
+          <input type="hidden" name="position" value="{{ loop.index0 }}" class="pos">
+          <input type="hidden" name="id_tableau" value="{{ tableau.id }}">
+          <input type="text" name="titre" value="{{ tableau.titre }}" oninput="saveMode(this.closest('.w3-panel'));" required><br>
+          <textarea name="description" class="w3-block" rows="6" oninput="saveMode(this.closest('.w3-panel'));">
+          {{- tableau.description|join('\n')-}}
+          </textarea>
+          <input type="submit" name="action" value="Mettre à jour" class="maj-btn" disabled>
+          <button type="button" class="maj-btn" onClick="window.location.reload();" disabled>Annuler</button>
+          <input type="submit" name="action" value="Supprimer" class="w3-right">
+        </form>
+        <div class="w3-quarter w3-padding-small">
         <img src="{{ tableau.src }}" alt="{{ tableau.titre.strip() }}" class="w3-right" style="object-fit:cover; width:200px; height:200px;"
              onclick="document.getElementById('modal').style.display='block'; document.getElementById('modal').firstElementChild.src=this.src;">
       </div>
+      </div>
     </div>
+    {%- endfor %}
   </div>
-  {%- endfor %}
-  <div class="w3-panel w3-black w3-opacity-max w3-padding-small">
+  <div id="new_row" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin" ondragover="allowDrop(event);" ondrop="swapRow(event);">
     <div>
-      <button onclick="dropTab(this, ['&plus;', '&plus;'], 'new_tab');">&plus;</button>
-      <span>Ajouter un tableau</span>
+      <button onclick="togglePanel(this.closest('.w3-panel'));">&plus;</button>
+      <span>Ajouter un tableau ici</span>
     </div>
-    <div id="new_tab" class="w3-hide w3-row">
+    <div class="w3-hide w3-row">
       <form enctype=multipart/form-data action="{{ url_for('admin_tableaux', id_collection=collection.id) }}" method="POST" class="w3-threequarter w3-padding-small" autocomplete="off">
-        <input type="text" name="titre">
-        <input type="file" name="tableau" accept="image/jpeg" required><br>
-        <textarea name="description" class="w3-block" rows="6"></textarea>
+        <input type="hidden" name="position" value="" class="pos">
+        <input type="text" name="titre" oninput="saveMode(this.closest('.w3-panel'));" required>
+        <input type="file" name="tableau" accept="image/jpeg" required><br><br>
+        <textarea name="description" class="w3-block" rows="6" oninput="saveMode(this.closest('.w3-panel'));"></textarea>
         <input type="submit" name="action" value="Ajouter">
+        <button type="button" class="maj-btn" onClick="window.location.reload();" disabled>Annuler</button>
       </form>
     </div>
   </div>
 </div>
-  <div onclick="this.style.display='none';" id="modal" class="w3-modal w3-center">
-    <img class="w3-modal-content w3-animate-opacity" src="\static\images\couverture_01.jpg" alt="Modal" style="background-color:transparent; max-height:75vh; object-fit: none;">
-  </div>
+<div onclick="this.style.display='none';" id="modal" class="w3-modal w3-center">
+  <img class="w3-modal-content w3-animate-opacity" src="\static\images\couverture_01.jpg" alt="Modal" style="background-color:transparent; max-height:75vh; object-fit: none;">
+</div>
 <script>
-  function dropTab(bouton, symboles, id_tableau) {
-    let tab = document.getElementById(id_tableau);
-    if (tab.classList.contains('w3-hide')) {
-      bouton.innerHTML = symboles[1];
-      tab.classList.replace('w3-hide', 'w3-show');
+  function foldPanel(row) {
+    row.lastElementChild.classList.add('w3-hide');
+    for (ddbtn of row.getElementsByClassName('dropdown-button')) {
+      ddbtn.innerHTML = '&#9654;';
+    };
+  };
+
+  function unfoldPanel(row) {
+    row.lastElementChild.classList.remove('w3-hide');
+    for (ddbtn of row.getElementsByClassName('dropdown-button')) {
+      ddbtn.innerHTML = '&#9660;';
+    };
+  };
+
+  function foldAllPanels() {
+    for (panel of document.getElementsByClassName('w3-panel')) {
+      if (panel.children.length > 1) {
+        foldPanel(panel);
+      };
+    };
+  };
+
+  function togglePanel(row) {
+    if (document.modified) {
+      alert('Des modifications sont en cours sur cette collection, mettre à jour ou annuler avant d\'en entreprendre d\'autres.');
+    } else if (row.lastElementChild.classList.contains('w3-hide')) {
+      foldAllPanels();
+      unfoldPanel(row);
     } else {
-      bouton.innerHTML = symboles[0];
-      tab.classList.replace('w3-show', 'w3-hide');
+      foldAllPanels();
+    };
+  };
+
+  function saveMode(row) {
+    row.classList.replace('w3-brown', 'w3-red');
+    document.modified = true;
+    for (btn of row.getElementsByClassName('maj-btn')) {
+      btn.disabled=false;
     }
+  };
+
+  function allowDrop(ev) {
+    ev.preventDefault();
+  };
+
+  function startDrag(ev) {
+    foldAllPanels();
+    ev.dataTransfer.setData('row_id', ev.target.id);
+  };
+
+  function swapRow(ev) {
+    ev.preventDefault();
+    var dropped_row = document.getElementById(ev.dataTransfer.getData('row_id'));
+    var this_row = ev.target.closest('.w3-panel');
+    this_row.insertAdjacentElement("beforeBegin", dropped_row);
+    dropped_row.getElementsByClassName('pos')[0].value = this_row.getElementsByClassName('pos')[0].value;
+    saveMode(dropped_row);
+    unfoldPanel(dropped_row);
   };
 </script>
 {% endblock contenu %}
