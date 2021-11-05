@@ -1,40 +1,40 @@
 {% extends "layout.html" %}
 
 {% block titre %}
-<title>{{ titre_page }}</title>
+<title>{{ collection.titre.strip().replace('&#39;', '\'') }}</title>
 {% endblock titre %}
 
 {% block contenu %}
 <div class="w3-col l2 m12 w3-hide-small">
   <div class="w3-margin w3-padding-small w3-card-4 w3-black w3-opacity-max">
     <h3 style="overflow:hidden; text-overflow:clip;">
-      <b>&#8618;&#8239;{{ carousel.titre.strip() }}</b>
-      {% if carousel.description %}
+      <b>&#8618;&#8239;{{ collection.titre.strip().replace('&#39;', '\'') }}</b>
+      {% if collection.description %}
       <button class="w3-right w3-hide-large" onclick="basculerPanneauInfos(this);">
         <span class="w3-hide-small">Informations sur la série </span><span>&#9664;</span></button>
-      {% endif %}
+      {%- endif %}
     </h3>
-    {% if carousel.description %}
+    {%- if collection.description %}
     <div id="panneau_infos" class="w3-hide-small w3-hide-medium">
-      {% for paragraphe in carousel.description -%}
-      <p class="w3-small">{{ paragraphe.strip() }}</p>
-      {% endfor %}
+    {%- for paragraphe in collection.description.split('\n') %}
+      <p class="w3-small">{{ paragraphe.strip().replace('&#39;', '\'') }}</p>
+    {%- endfor %}
     </div>
     {% endif %}
   </div>
 </div>
 <div class="w3-col l8 m12 s12 w3-display-container" style="height:600px">
-  {% for tableau in carousel.tableaux %}
+  {% for tableau in collection.tableaux %}
   <div class="vue" style="display:none; height:inherit; width:inherit">
     <img class="w3-animate-opacity w3-display-middle w3-card-4" src="{{ tableau.src }}"
-         alt="{{ tableau.titre.strip() if tableau.titre else 'Tableau' }}" style="max-width:100%; max-height:100%">
+         alt="{{ tableau.titre.strip().replace('&#39;', '\'') if tableau.titre else 'Tableau' }}" style="max-width:100%; max-height:100%">
     <div class="w3-hide">
-      <h4><b>{{ tableau.titre.strip() if tableau.titre else "Tableau sans titre" }}</b></h4>
+      <h4><b>{{ tableau.titre.strip().replace('&#39;', '\'') if tableau.titre else "Tableau sans titre" }}</b></h4>
       <p>
         Arlette Le More<br>
         {% if tableau.description -%}
-        {%- for paragraphe in tableau.description %}
-        {{ paragraphe.strip() }}<br>
+        {%- for paragraphe in tableau.description.split('\n') %}
+        {{ paragraphe.strip().replace('&#39;', '\'') }}<br>
         {%- endfor %}
         {%- endif %}
       </p>

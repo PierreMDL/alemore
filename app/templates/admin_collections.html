@@ -5,28 +5,28 @@
 {% block contenu %}
 <div class="w3-content">
   <div>
-    {%- for étiquette in étiquettes %}
-    <div id="{{ 'row_' + étiquette.id|string }}" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin" draggable="true" ondragstart="startDrag(event);" ondrop="swapRow(event);" ondragover="allowDrop(event);">
+    {%- for collection in collections %}
+    <div id="{{ 'row_' + collection.id|string }}" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin" draggable="true" ondragstart="startDrag(event);" ondrop="swapRow(event);" ondragover="allowDrop(event);">
       <div>
         <button class="dropdown-button" onclick="togglePanel(this.closest('.w3-panel'));">&#9654;</button>
-        <span>{{ étiquette.titre }}</span>
+        <span>{{ collection.titre.strip().replace('&#39;', '\'') }}</span>
       </div>
       <div class="w3-hide w3-row">
         <form action="{{ url_for('admin_collections') }}" method="POST"
               class="w3-threequarter w3-padding-small" autocomplete="off">
           <input type="hidden" name="position" value="{{ loop.index0 }}" class="pos">
-          <input type="hidden" name="id_collection" value="{{ étiquette.id }}">
-          <input type="text" name="titre" value="{{ étiquette.titre }}" oninput="saveMode(this.closest('.w3-panel'));" required><br>
+          <input type="hidden" name="id_collection" value="{{ collection.id }}">
+          <input type="text" name="titre" value="{{ collection.titre.strip().replace('&#39;', '\'') }}" oninput="saveMode(this.closest('.w3-panel'));" required><br>
           <textarea name="description" class="w3-block" rows="6" oninput="saveMode(this.closest('.w3-panel'));">
-          {{- étiquette.description|join('\n')-}}
+          {{- collection.description.strip().replace('&#39;', '\'') -}}
           </textarea>
           <input type="submit" name="action" value="Mettre à jour" class="maj-btn" disabled>
           <button type="button" class="maj-btn" onClick="window.location.reload();" disabled>Annuler</button>
           <input type="submit" name="action" value="Supprimer" class="w3-right">
         </form>
         <div class="w3-quarter w3-padding-small">
-          <a href="{{ url_for('admin_tableaux', id_collection=étiquette.id) }}">
-            <img src="{{ étiquette.src }}" alt="{{ étiquette.titre.strip() }}"
+          <a href="{{ url_for('admin_tableaux', id_collection=collection.id) }}">
+            <img src="{{ collection.src }}" alt="{{ collection.titre.strip().replace('&#39;', '\'') }}"
                  class="w3-right" style="object-fit:cover; width:200px; height:200px;">
           </a>
         </div>

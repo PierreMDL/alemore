@@ -9,18 +9,18 @@
     <div id="{{ 'row_' + tableau.id|string }}" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin" draggable="true" ondragstart="startDrag(event);" ondrop="swapRow(event);" ondragover="allowDrop(event);">
       <div>
         <button class="dropdown-button" onclick="togglePanel(this.closest('.w3-panel'));">&#9654;</button>
-        <span>{{ tableau.titre }}</span>
+        <span>{{ tableau.titre.strip().replace('&#39;', '\'') }}</span>
       </div>
       <div class="w3-hide w3-row">
         <form action="{{ url_for('admin_tableaux', id_collection=collection.id) }}" method="POST"
               class="w3-threequarter w3-padding-small" autocomplete="off">
           <input type="hidden" name="position" value="{{ loop.index0 }}" class="pos">
           <input type="hidden" name="id_tableau" value="{{ tableau.id }}">
-          <input type="text" name="titre" value="{{ tableau.titre }}" oninput="saveMode(this.closest('.w3-panel'));" required><br>
+          <input type="text" name="titre" value="{{ tableau.titre.replace('&#39;', '\'') }}" oninput="saveMode(this.closest('.w3-panel'));" required><br>
           <textarea name="description" class="w3-block" rows="6" oninput="saveMode(this.closest('.w3-panel'));">
-          {{- tableau.description|join('\n')-}}
+          {{- tableau.description.strip().replace('&#39;', '\'') -}}
           </textarea>
-          <input type="submit" name="action" value="Mettre à jour" class="maj-btn" disabled>
+          <input type ="submit" name="action" value="Mettre à jour" class="maj-btn" disabled>
           <button type="button" class="maj-btn" onClick="window.location.reload();" disabled>Annuler</button>
           <input type="submit" name="action" value="Supprimer" class="w3-right">
         </form>

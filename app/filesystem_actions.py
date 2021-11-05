@@ -34,7 +34,10 @@ def créer_fichier(id_collection, nom_fichier, fichier):
 
 
 def supprimer_dossier(id_collection):
-    shutil.rmtree(construire_chemin_dossier(id_collection))
+    try:
+        shutil.rmtree(construire_chemin_dossier(id_collection))
+    except OSError as e:
+        print(e.strerror)
 
 
 def supprimer_fichier(id_collection, nom_fichier):
