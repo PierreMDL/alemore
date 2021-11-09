@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 flask = "*"
 flask-sqlalchemy = "*"
+pillow = "*"
+piexif = "*"
 
 [dev-packages]
 

@@ -1,5 +1,5 @@
 from . import db
-from .filesystem_actions import construire_chemin_fichier
+from .filesystem_actions import *
 
 
 class Collection(db.Model):
@@ -22,6 +22,48 @@ class Collection(db.Model):
         else:
             return construire_chemin_fichier("", "placeholder.jpg", from_root=False)
 
+    def ajouter(self):
+        db.session.add(self)
+        db.session.flush()
+        try:
+            créer_dossier(self.id)
+        except Exception as e:
+            db.session.rollback()
+            raise
+        else:
+            db.session.commit()
+
+    def supprimer(self):
+        db.session.delete(self)
+        db.session.flush()
+        try:
+            supprimer_dossier(self.id)
+        except Exception as e:
+            db.session.rollback()
+            raise
+        else:
+            db.session.commit()
+
+    def sauvegarder(self):
+        db.session.commit()
+
+    @property
+    def toutes_les_positions(self):
+        q = Collection.query \
+            .filter_by(est_une_série=True) \
+            .with_entities(Collection.position, Collection.id) \
+            .order_by(Collection.position) \
+            .all()
+        return q
+
+    def dernière_position(self):
+        q = Collection.query \
+            .filter_by(est_une_série=True) \
+            .with_entities(Collection.position) \
+            .order_by(Collection.position.desc()) \
+            .first()
+        return q[0] if q else 0
+
 
 class Tableau(db.Model):
     __tablename__ = "tableaux"
@@ -38,3 +80,50 @@ class Tableau(db.Model):
     @property
     def src(self):
         return construire_chemin_fichier(self.collection_id, self.nom_fichier, from_root=False)
+
+    def ajouter(self, image_handle):
+        db.session.add(self)
+        db.session.flush()
+
+        try:
+            créer_fichier(self, image_handle)
+        except Exception as e:
+            db.session.rollback()
+            raise
+        else:
+            db.session.commit()
+
+    def mettre_à_jour(self, nouveau_nom_fichier):
+        mettre_à_jour_fichier(self, nouveau_nom_fichier)
+
+    def supprimer(self):
+        db.session.delete(self)
+        db.session.flush()
+        try:
+            supprimer_fichier(self.collection_id, self.nom_fichier)
+        except Exception as e:
+            db.session.rollback()
+            raise
+        else:
+            db.session.commit()
+
+    def sauvegarder(self):
+        db.session.commit()
+
+    @property
+    def toutes_les_positions(self):
+        q = Tableau.query \
+            .filter_by(collection_id=self.collection_id) \
+            .with_entities(Tableau.position, Tableau.id) \
+            .order_by(Tableau.position) \
+            .all()
+        return q
+
+    @property
+    def dernière_position(self):
+        q = self.query \
+            .filter_by(collection_id=self.collection_id) \
+            .with_entities(Tableau.position) \
+            .order_by(Tableau.position.desc()) \
+            .first()
+        return q[0] if q else 0

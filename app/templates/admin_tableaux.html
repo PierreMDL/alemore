@@ -6,23 +6,23 @@
 <div class="w3-content">
   <div>
     {%- for tableau in collection.tableaux %}
-    <div id="{{ 'row_' + tableau.id|string }}" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin" draggable="true" ondragstart="startDrag(event);" ondrop="swapRow(event);" ondragover="allowDrop(event);">
-      <div>
+    <div id="{{ 'row_' + tableau.id|string }}" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin">
+      <div draggable="true" ondragstart="startDrag(event);" ondrop="swapRow(event);" ondragover="allowDrop(event);" ondragleave="makeMoreOpaque(this.closest('.w3-panel'));">
         <button class="dropdown-button" onclick="togglePanel(this.closest('.w3-panel'));">&#9654;</button>
-        <span>{{ tableau.titre.strip().replace('&#39;', '\'') }}</span>
+        <span>{{ tableau.titre.strip()|safe }}</span>
       </div>
       <div class="w3-hide w3-row">
-        <form action="{{ url_for('admin_tableaux', id_collection=collection.id) }}" method="POST"
+        <form action="{{ url_for('admin_modifier_tableau', id_collection=collection.id) }}" method="POST"
               class="w3-threequarter w3-padding-small" autocomplete="off">
           <input type="hidden" name="position" value="{{ loop.index0 }}" class="pos">
-          <input type="hidden" name="id_tableau" value="{{ tableau.id }}">
-          <input type="text" name="titre" value="{{ tableau.titre.replace('&#39;', '\'') }}" oninput="saveMode(this.closest('.w3-panel'));" required><br>
+          <input type="hidden" name="id_élément" value="{{ tableau.id }}">
+          <input type="text" name="titre" value="{{ tableau.titre|safe }}" oninput="saveMode(this.closest('.w3-panel'));" required><br>
           <textarea name="description" class="w3-block" rows="6" oninput="saveMode(this.closest('.w3-panel'));">
-          {{- tableau.description.strip().replace('&#39;', '\'') -}}
+          {{- tableau.description.strip()|safe -}}
           </textarea>
           <input type ="submit" name="action" value="Mettre à jour" class="maj-btn" disabled>
           <button type="button" class="maj-btn" onClick="window.location.reload();" disabled>Annuler</button>
-          <input type="submit" name="action" value="Supprimer" class="w3-right">
+          <input type="submit" name="action" formaction="{{ url_for('admin_supprimer_tableau', id_collection=collection.id)}}" value="Supprimer" class="w3-right">
         </form>
         <div class="w3-quarter w3-padding-small">
         <img src="{{ tableau.src }}" alt="{{ tableau.titre.strip() }}" class="w3-right" style="object-fit:cover; width:200px; height:200px;"
@@ -32,13 +32,13 @@
     </div>
     {%- endfor %}
   </div>
-  <div id="new_row" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin" ondragover="allowDrop(event);" ondrop="swapRow(event);">
-    <div>
+  <div id="new_row" class="w3-panel w3-brown w3-opacity-min w3-padding-small w3-margin">
+    <div ondragover="allowDrop(event);" ondrop="swapRow(event);" ondragleave="makeMoreOpaque(this);">
       <button onclick="togglePanel(this.closest('.w3-panel'));">&plus;</button>
       <span>Ajouter un tableau ici</span>
     </div>
     <div class="w3-hide w3-row">
-      <form enctype=multipart/form-data action="{{ url_for('admin_tableaux', id_collection=collection.id) }}" method="POST" class="w3-threequarter w3-padding-small" autocomplete="off">
+      <form enctype=multipart/form-data action="{{ url_for('admin_ajouter_tableau', id_collection=collection.id) }}" method="POST" class="w3-threequarter w3-padding-small" autocomplete="off">
         <input type="hidden" name="position" value="" class="pos">
         <input type="text" name="titre" oninput="saveMode(this.closest('.w3-panel'));" required>
         <input type="file" name="tableau" accept="image/jpeg" required><br><br>
@@ -96,11 +96,17 @@
 
   function allowDrop(ev) {
     ev.preventDefault();
+    var this_panel = ev.target.closest('.w3-panel');
+    this_panel.classList.replace('w3-opacity-min', 'w3-opacity-max');
+  };
+
+  function makeMoreOpaque(panel) {
+    panel.classList.replace('w3-opacity-max', 'w3-opacity-min');
   };
 
   function startDrag(ev) {
     foldAllPanels();
-    ev.dataTransfer.setData('row_id', ev.target.id);
+    ev.dataTransfer.setData('row_id', ev.target.closest('.w3-panel').id);
   };
 
   function swapRow(ev) {
@@ -108,6 +114,7 @@
     var dropped_row = document.getElementById(ev.dataTransfer.getData('row_id'));
     var this_row = ev.target.closest('.w3-panel');
     this_row.insertAdjacentElement("beforeBegin", dropped_row);
+    makeMoreOpaque(this_row);
     dropped_row.getElementsByClassName('pos')[0].value = this_row.getElementsByClassName('pos')[0].value;
     saveMode(dropped_row);
     unfoldPanel(dropped_row);
